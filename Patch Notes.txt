@@ -1,13 +1,11 @@
 Features:
--Background music
--Hit sound effects
--Reusable object setup system
+-Player and Enemy animation
+-Per-enemy animation state system
 
 Improvements:
--Naming consistency overhaul
--Cleaner restart flow
--Better collision feedback
--Less duplicate setup code
+-Smoother enemy movement timing
+-Better visual feedback during play
+-Animation integrated into movement logic
 
-Minor Fixes:
--Minor restart edge cases
+Bug Fixes:
+-Minor timing stability

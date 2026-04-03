@@ -46,15 +46,21 @@ def setup_objects(game_object, object_model, object_x, object_y, start_shown, al
 
 ### Carrot Setup ###
 carrots = [] #List to contain enemies
+carrot_frames = ["carrotFrame1.gif", "carrotFrame2.gif"]
+carrot_frame_state = [True,True,True]
 for i in range(3):
     carrots.append(trtl.Turtle()) 
-setup_objects(carrots[0],"carrotMan.gif",290,290,True,False)
-setup_objects(carrots[1],"carrotMan.gif",-290,210,True,True)
-setup_objects(carrots[2],"carrotMan.gif",-290,-290,True,True)
+setup_objects(carrots[0],carrot_frames[0],290,290,True,False)
+setup_objects(carrots[1],carrot_frames[0],-290,210,True,True)
+setup_objects(carrots[2],carrot_frames[0],-290,-290,True,True)
+screen.addshape(carrot_frames[1])
 
 ### Player Setup ###
+player_frame_state = True
+player_frames = ["potatoFrame1.gif", "potatoFrame2.gif"]
 player = trtl.Turtle()
-setup_objects(player,"potatoBoy.gif",100,-100,True,False)
+setup_objects(player,player_frames[0],100,-100,True,False)
+screen.addshape(player_frames[1])
 
 ### Hearts Setup ###
 lives = 3
@@ -108,6 +114,7 @@ def right():
     x_cor, y_cor = player.position()
     player.seth(0)
     if check_out_bounds(player_movement_speed, 0, x_cor, y_cor):
+        animate_player()
         player.forward(player_movement_speed)
 
 #Moves The Player Up
@@ -115,6 +122,7 @@ def up():
     player.seth(90)
     x_cor, y_cor = player.position()
     if check_out_bounds(player_movement_speed, 90, x_cor, y_cor):
+        animate_player()
         player.forward(player_movement_speed)
 
 #Moves The Player Left
@@ -122,6 +130,7 @@ def left():
     x_cor, y_cor = player.position()
     player.seth(180)
     if check_out_bounds(player_movement_speed, 180, x_cor, y_cor):
+        animate_player()
         player.forward(player_movement_speed)
 
 #Moves The Player Down
@@ -129,7 +138,16 @@ def down():
     player.seth(270)
     x_cor, y_cor = player.position()
     if check_out_bounds(player_movement_speed, 270, x_cor, y_cor):
+        animate_player()
         player.forward(player_movement_speed)
+
+def animate_player():
+    global player_frame_state
+    player_frame_state = not player_frame_state
+    if player_frame_state == True:
+        player.shape(player_frames[0])
+    else:
+        player.shape(player_frames[1])
 
 ### Checks If Enemies And/Or The Player Is Out Of Bounds ###
 def check_out_bounds(speed, direction, x_cor, y_cor):
@@ -143,23 +161,6 @@ def check_out_bounds(speed, direction, x_cor, y_cor):
         return True
     return False
 
-### Key Presses For Player Movement ###
-#Up Movements
-screen.onkey(up, "Up")
-screen.onkey(up, "w")
-
-#Left Movements
-screen.onkey(left, "Left")
-screen.onkey(left, "a")
-
-#Right Movements
-screen.onkey(right, "Right")
-screen.onkey(right, "d")
-
-#Down Movements
-screen.onkey(down, "Down")
-screen.onkey(down, "s")
-
 ### Enemy Movements [Random] ###
 def carrot_movement():
     global carrot_movement_speed
@@ -170,11 +171,12 @@ def carrot_movement():
            if carrot_movement_speed != 5 and timer_value >= 10:
                carrot_movement_speed = 5
            follow_player(carrots[i])
+        animate_carrot(carrots[i], i)
         check_collision()
     #Checks if the game is over
     #If the game is over, the carrot timer will stop
     if not game_over:
-        screen.ontimer(carrot_movement, 25) #restart carrot movement loop
+        screen.ontimer(carrot_movement, 50) #restart carrot movement loop
 
 ### Random Movement
 def random_movement(carrot):
@@ -200,6 +202,14 @@ def follow_player(carrot):
     else:
         carrot.seth(270)
         carrot.forward(carrot_movement_speed)
+
+def animate_carrot(carrot, carrot_num):
+    global carrot_frame_state
+    carrot_frame_state[carrot_num] = not carrot_frame_state[carrot_num]
+    if carrot_frame_state[carrot_num] == True:
+        carrot.shape(carrot_frames[0])
+    else:
+        carrot.shape(carrot_frames[1])
 
 ### Check For Collisions ###
 def check_collision():
@@ -306,7 +316,7 @@ def start_new_game(x,y):
     digits[2].goto(180, 265)
     #Restart carrot movement and clock timer
     screen.ontimer(update_timer, 1000)
-    screen.ontimer(carrot_movement, 25)
+    screen.ontimer(carrot_movement, 50)
     #Enable main music loop
     mixer.music.load(music_loop)
     mixer.music.play(-1)
@@ -316,12 +326,29 @@ def start_new_game(x,y):
 #Looks for key presses
 screen.listen() 
 
+### Key Presses For Player Movement ###
+#Up Movements
+screen.onkey(up, "Up")
+screen.onkey(up, "w")
+
+#Left Movements
+screen.onkey(left, "Left")
+screen.onkey(left, "a")
+
+#Right Movements
+screen.onkey(right, "Right")
+screen.onkey(right, "d")
+
+#Down Movements
+screen.onkey(down, "Down")
+screen.onkey(down, "s")
+
 ### Button press for a new game ###
 new_game.onclick(start_new_game)
         
 ### Timers ###
 #Carrot Movement Timer
-screen.ontimer(carrot_movement, 25)
+screen.ontimer(carrot_movement, 50)
 
 #On Screen Timer
 screen.ontimer(update_timer, 1000)
@@ -332,6 +359,8 @@ trtl.Screen().mainloop()
 '''
 Possible Updates for Future Versions:
      -Add animations for characters
+         -Back frames for carrot
+         -Back and maybe side frames for player
      -Add broccoli guy and pepper kid 
         ->Pepper gives short speed boost, but shows up only once every so often
         ->Brocoli gives a heart, but only appears when at 1 heart
