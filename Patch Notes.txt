@@ -1,10 +1,13 @@
-Bug Fixes:
--Carrot knockback could push enemies out of bounds
--Restart didn’t fully restore enemy speed
+Features:
+-Background music
+-Hit sound effects
+-Reusable object setup system
 
 Improvements:
--Movement bounds logic standardized
--Cleaner player movement code
--Enemy chase tuning
--Random movement simplified
--Polish and stability
+-Naming consistency overhaul
+-Cleaner restart flow
+-Better collision feedback
+-Less duplicate setup code
+
+Minor Fixes:
+-Minor restart edge cases

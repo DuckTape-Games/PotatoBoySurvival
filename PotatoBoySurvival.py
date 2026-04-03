@@ -6,77 +6,72 @@ Goal: Survive as long as possible without losing all 3 lives
 ### IMPORTS ###
 import turtle as trtl #Turtle interface, used for game functionality and visuals, shortened to trtl
 import random as rnd #Random, used to randomly generate enemy movements, shortened to rnd
+from pygame import mixer #Mixer from the pygame library, used for music loops and sound effects
 
-### Screen Setup ###
+### Game Base and Screen Setup ###
 trtl.clearscreen()
 screen = trtl.Screen()
 trtl.title("Potato Boy Survival")
 screen.setup(700,700)
-screen._root.resizable(False, False)
+#Calls to tkinter
+screen._root.resizable(False, False) #Sets the screen to not be resizable
+screen._root.iconbitmap("potatoBoy.ico") #Sets up the app icon
+#Set background
 screen.bgpic("bg.gif")
-Font = ("Monospace", 50)
-gameOver = False
+#Create game_over and set it to false
+game_over = False
 #Default movement speeds 
-playerMovementSpeed = 15
-CarrotMovementSpeed = 17
+player_movement_speed = 15
+carrot_movement_speed = 17
+#Music Setup
+mixer.init()
+music_loop = "musicLoop.wav" #Created by user EEE3333E on freesound.org
+game_over_music_loop = "gameOverMusicLoop.wav" #Modified version of the game loop music
+mixer.music.load(music_loop)
+mixer.music.play(-1)
+#Hit Sound Setup
+hit_sound = mixer.Sound('hitSound.wav') #Created by user Sadiquecat on freesound.org
+
+### Function to condense object setup lines ###  
+def setup_objects(game_object, object_model, object_x, object_y, start_shown, already_registered):
+    game_object.speed(0)
+    game_object.hideturtle()
+    game_object.penup()
+    if not already_registered: #Prevents registering a model twice
+        screen.addshape(object_model)
+    game_object.shape(object_model)
+    game_object.goto(object_x,object_y)
+    if start_shown: #Determines if the object being created will be shown to start the ga
+        game_object.showturtle()
 
 ### Carrot Setup ###
-# Before player setup so that the player will apear above the carrots on the screen #
-screen.addshape("carrotMan.gif")
-carrots = []    
+carrots = [] #List to contain enemies
 for i in range(3):
-    carrots.append(trtl.Turtle())
-    carrots[i].speed(0)
-    carrots[i].hideturtle()
-    carrots[i].shape("carrotMan.gif")
-    carrots[i].penup()
-    if i == 0:
-        carrots[i].goto(290,290)
-    elif i == 1:
-        carrots[i].goto(-290,210)
-    elif i == 2:
-        carrots[i].goto(-290,-290)
-    carrots[i].showturtle()
+    carrots.append(trtl.Turtle()) 
+setup_objects(carrots[0],"carrotMan.gif",290,290,True,False)
+setup_objects(carrots[1],"carrotMan.gif",-290,210,True,True)
+setup_objects(carrots[2],"carrotMan.gif",-290,-290,True,True)
 
 ### Player Setup ###
-screen.addshape("potatoBoy.gif")
-Player = trtl.Turtle()
-Player.shape("potatoBoy.gif")
-Player.penup()
-Player.speed(0)
-Player.goto(100,-100)
+player = trtl.Turtle()
+setup_objects(player,"potatoBoy.gif",100,-100,True,False)
 
 ### Hearts Setup ###
-screen.addshape("heart.gif")
-screen.addshape("damaged.gif")
 lives = 3
 hearts = []
 for i in range(3):
     hearts.append(trtl.Turtle())
-    hearts[i].speed(0)
-    hearts[i].hideturtle()
-    hearts[i].penup()
-    hearts[i].shape("heart.gif")
-    if i == 0:
-        hearts[i].goto(-275,275)
-    elif i == 1:
-        hearts[i].goto(-205,275)
-    else:
-        hearts[i].goto(-135,275)
-    hearts[i].showturtle()
+setup_objects(hearts[0],"heart.gif",-275,275,True,False)
+setup_objects(hearts[1],"heart.gif",-205,275,True,True)
+setup_objects(hearts[2],"heart.gif",-135,275,True,True)
+screen.addshape("damaged.gif") #Sprite for when the player gets hurt
 
 ### Create Timer and Timer Icon ###
 #Timer Icon
-screen.addshape("timer.gif")
-TimerIcon = trtl.Turtle()
-TimerIcon.hideturtle()
-TimerIcon.speed(0)
-TimerIcon.shape("timer.gif")
-TimerIcon.penup()
-TimerIcon.goto(135,265)
-TimerIcon.showturtle()
+timer_icon = trtl.Turtle()
+setup_objects(timer_icon,"timer.gif",135,265,True,False)
 #Timer Variable
-timer = 0
+timer_value = 0
 
 ## Pixel Numbers ##
 numbers = []
@@ -87,214 +82,202 @@ for i in range(10):
 digits = []
 for i in range(3):
     digits.append(trtl.Turtle())
-    digits[i].hideturtle()
-    digits[i].speed(0)
-    digits[i].shape(numbers[0])
-    digits[i].penup()
-    if i == 0:
-        digits[i].goto(260, 265)
-    elif i == 1:
-        digits[i].goto(220, 265)
-    else:
-        digits[i].goto(180, 265)
-    digits[i].showturtle()
+setup_objects(digits[0],numbers[0],260,265,True,True)
+setup_objects(digits[1],numbers[0],220,265,True,True)
+setup_objects(digits[2],numbers[0],180,265,True,True)
 
 ### Create Game Over Screen
-screen.addshape("gameOver.gif")
-GameOverText = trtl.Turtle()
-GameOverText.speed(0)
-GameOverText.penup()
-GameOverText.hideturtle()
-GameOverText.shape("gameOver.gif")
-GameOverText.goto(-35,30)
+game_over_text = trtl.Turtle()
+setup_objects(game_over_text,"gameOver.gif",-35,30,False,False)
 
 ### Create Survival Time Text ###
-screen.addshape("survivalTime.gif")
-SurvivalTimeText = trtl.Turtle()
-SurvivalTimeText.speed(0)
-SurvivalTimeText.penup()
-SurvivalTimeText.hideturtle()
-SurvivalTimeText.shape("survivalTime.gif")
-SurvivalTimeText.goto(-5,-190)
+survival_time_text = trtl.Turtle()
+setup_objects(survival_time_text,"survivalTime.gif",-5,-190,False,False)
 
 ### New Game Button ###
-screen.addshape("newGame.gif")
+new_game = trtl.Turtle()
+setup_objects(new_game,"newGame.gif",0,-280,False,False)
 screen.addshape("newGamePressed.gif") #changes to this when New Game is pressed
-NewGame = trtl.Turtle()
-NewGame.speed(0)
-NewGame.penup()
-NewGame.hideturtle()
-NewGame.shape("newGame.gif")
-NewGame.goto(0,-280)
+    
+#Make sure everything is appearing on screen
+screen.update()
 
 ### Player Movement Functions ###
 #Moves The Player Right
-def Right():
-    xCor, yCor = Player.position()
-    Player.seth(0)
-    if CheckOutBounds(playerMovementSpeed, 0, xCor, yCor):
-        Player.forward(playerMovementSpeed)
+def right():
+    x_cor, y_cor = player.position()
+    player.seth(0)
+    if check_out_bounds(player_movement_speed, 0, x_cor, y_cor):
+        player.forward(player_movement_speed)
 
 #Moves The Player Up
-def Up():
-    Player.seth(90)
-    xCor, yCor = Player.position()
-    if CheckOutBounds(playerMovementSpeed, 90, xCor, yCor):
-        Player.forward(playerMovementSpeed)
+def up():
+    player.seth(90)
+    x_cor, y_cor = player.position()
+    if check_out_bounds(player_movement_speed, 90, x_cor, y_cor):
+        player.forward(player_movement_speed)
 
 #Moves The Player Left
-def Left():
-    xCor, yCor = Player.position()
-    Player.seth(180)
-    if CheckOutBounds(playerMovementSpeed, 180, xCor, yCor):
-        Player.forward(playerMovementSpeed)
+def left():
+    x_cor, y_cor = player.position()
+    player.seth(180)
+    if check_out_bounds(player_movement_speed, 180, x_cor, y_cor):
+        player.forward(player_movement_speed)
 
 #Moves The Player Down
-def Down():
-    Player.seth(270)
-    xCor, yCor = Player.position()
-    if CheckOutBounds(playerMovementSpeed, 270, xCor, yCor):
-        Player.forward(playerMovementSpeed)
+def down():
+    player.seth(270)
+    x_cor, y_cor = player.position()
+    if check_out_bounds(player_movement_speed, 270, x_cor, y_cor):
+        player.forward(player_movement_speed)
 
 ### Checks If Enemies And/Or The Player Is Out Of Bounds ###
-def CheckOutBounds(speed, direction, xCor, yCor):
-    if direction == 90 and yCor + speed < 330: #Check up
+def check_out_bounds(speed, direction, x_cor, y_cor):
+    if direction == 90 and y_cor + speed < 330: #Check up
         return True 
-    elif direction == 270 and yCor - speed > -290: #Check down
+    elif direction == 270 and y_cor - speed > -290: #Check down
         return True
-    elif direction == 0 and xCor + speed < 300: #Check right
+    elif direction == 0 and x_cor + speed < 300: #Check right
         return True
-    elif direction == 180 and xCor - speed > -320: #Check left
+    elif direction == 180 and x_cor - speed > -320: #Check left
         return True
     return False
 
 ### Key Presses For Player Movement ###
 #Up Movements
-screen.onkey(Up, "Up")
-screen.onkey(Up, "w")
+screen.onkey(up, "Up")
+screen.onkey(up, "w")
 
 #Left Movements
-screen.onkey(Left, "Left")
-screen.onkey(Left, "a")
+screen.onkey(left, "Left")
+screen.onkey(left, "a")
 
 #Right Movements
-screen.onkey(Right, "Right")
-screen.onkey(Right, "d")
+screen.onkey(right, "Right")
+screen.onkey(right, "d")
 
 #Down Movements
-screen.onkey(Down, "Down")
-screen.onkey(Down, "s")
-
-#Looks for key presses
-screen.listen() 
+screen.onkey(down, "Down")
+screen.onkey(down, "s")
 
 ### Enemy Movements [Random] ###
-def CarrotMovement():
-    global CarrotMovementSpeed
+def carrot_movement():
+    global carrot_movement_speed
     for i in range(len(carrots)):
-        if timer < 10:
-            RandomMovement(carrots[i])
+        if timer_value < 10:
+            random_movement(carrots[i])
         else:
-           if CarrotMovementSpeed != 7 and timer >= 10:
-               CarrotMovementSpeed = 5
-           FollowPlayer(carrots[i])
-        CheckCollision()
+           if carrot_movement_speed != 5 and timer_value >= 10:
+               carrot_movement_speed = 5
+           follow_player(carrots[i])
+        check_collision()
     #Checks if the game is over
     #If the game is over, the carrot timer will stop
-    if not gameOver:
-        screen.ontimer(CarrotMovement, 25) #restart carrot movement loop
+    if not game_over:
+        screen.ontimer(carrot_movement, 25) #restart carrot movement loop
 
 ### Random Movement
-def RandomMovement(carrot):
+def random_movement(carrot):
     direction = rnd.randint(0,3) * 90
-    carrot.seth(direction)
-    carX, carY = carrot.position()
+    x_cor, y_cor = carrot.position()
     #Checks if the move will bring the carrot out of bounds
-    if CheckOutBounds(CarrotMovementSpeed, direction, carX, carY):
-        carrot.forward(CarrotMovementSpeed)
+    if check_out_bounds(carrot_movement_speed, direction, x_cor, y_cor):
+        carrot.seth(direction)
+        carrot.forward(carrot_movement_speed)
 
 ### Move Towards Player AI ###
 # Effective speed is 1.41x speed
-def FollowPlayer(carrot):
-    if Player.xcor() > carrot.xcor():
+def follow_player(carrot):
+    if player.xcor() > carrot.xcor():
         carrot.seth(0)
-        carrot.forward(CarrotMovementSpeed)
+        carrot.forward(carrot_movement_speed)
     else:
         carrot.seth(180)
-        carrot.forward(CarrotMovementSpeed)
-    if Player.ycor() > carrot.ycor():
+        carrot.forward(carrot_movement_speed)
+    if player.ycor() > carrot.ycor():
         carrot.seth(90)
-        carrot.forward(CarrotMovementSpeed)
+        carrot.forward(carrot_movement_speed)
     else:
         carrot.seth(270)
-        carrot.forward(CarrotMovementSpeed)
+        carrot.forward(carrot_movement_speed)
 
 ### Check For Collisions ###
-def CheckCollision():
-    playerX, playerY = Player.position()
+def check_collision():
+    player_x, player_y = player.position()
     for i in range(len(carrots)):
-        carrotX, carrotY = carrots[i].position()
-        if (playerX - carrotX < 45 and playerX - carrotX > -45) and (playerY - carrotY < 70 and playerY - carrotY > -70):
-            jumpInBounds = False
-            while not jumpInBounds:
+        carrot_x, carrot_y = carrots[i].position()
+        if (player_x - carrot_x < 45 and player_x - carrot_x > -45) and (player_y - carrot_y < 70 and player_y - carrot_y > -70):
+            jump_in_bounds = False
+            while not jump_in_bounds:
                 direction = rnd.randint(0,3)*90
-                jumpInBounds = CheckOutBounds(300, direction, carrotX, carrotY)
+                jump_in_bounds = check_out_bounds(300, direction, carrot_x, carrot_y)
             carrots[i].seth(direction)
             carrots[i].forward(300)
-            Damaged()
+            damaged()
 
 ### Player Damaged ###
-def Damaged():
+def damaged():
     global lives
     if lives > 0:
         lives = lives - 1
+        hit_sound.play()
         hearts[lives].shape("damaged.gif")
         if lives == 0:
-            GameOver()
+            stop_game()
 
 ### Game Over Sequence ###
-def GameOver():
-    global gameOver
-    gameOver = True
+def stop_game():
+    global game_over
+    #Enable game over music loop
+    mixer.music.load(game_over_music_loop)
+    mixer.music.play(-1)
+    #Mark the game as over
+    game_over = True
+    #Hide hearts
     for i in range(len(hearts)):
         hearts[i].hideturtle()
+    #Hide carrots
     for i in range(len(carrots)):
         carrots[i].hideturtle()
-    Player.hideturtle()
-    TimerIcon.hideturtle()
-    GameOverText.showturtle()
-    SurvivalTimeText.showturtle()
+    #Hide player
+    player.hideturtle()
+    #Hide timer icon
+    timer_icon.hideturtle()
+    #Create game over screen
+    game_over_text.showturtle()
+    survival_time_text.showturtle()
     digits[0].goto(-125,-198)
     digits[1].goto(-165,-198)
     digits[2].goto(-205,-198)
-    NewGame.showturtle()
+    #Show new game button
+    new_game.showturtle()
 
 ### On Screen Timer ###
-def Timer():
-    global timer
-    if not gameOver: #Checks to make sure the game is still going
-        timer += 1
-        timerMath = timer
-        if timer <= 999:
+def update_timer():
+    global timer_value
+    if not game_over: #Checks to make sure the game is still going
+        timer_value += 1
+        timer_math = timer_value
+        if timer_value <= 999:
             for i in range(len(digits)):
-                digits[i].shape(numbers[timerMath % 10])
-                timerMath = int(timerMath / 10)
-        screen.ontimer(Timer, 1000) #restart timer loop
+                digits[i].shape(numbers[timer_math % 10])
+                timer_math = int(timer_math / 10)
+        screen.ontimer(update_timer, 1000) #restart timer loop
 
 ### Resets the game to default state ###
-def StartNewGame(x,y):
+def start_new_game(x,y):
     #Global Variables for this method
-    global gameOver
+    global game_over
     global lives
-    global timer
-    global CarrotMovementSpeed
+    global timer_value
+    global carrot_movement_speed
     #Change NewGame to the pressed color
-    NewGame.shape("newGamePressed.gif")
+    new_game.shape("newGamePressed.gif")
     #Hide objects shown during end screen
-    NewGame.hideturtle()
-    NewGame.shape("newGame.gif")
-    GameOverText.hideturtle()
-    SurvivalTimeText.hideturtle()
+    new_game.hideturtle()
+    new_game.shape("newGame.gif")
+    game_over_text.hideturtle()
+    survival_time_text.hideturtle()
     #Place hearts back on the screen
     for i in range(len(hearts)):
         hearts[i].showturtle()
@@ -309,33 +292,39 @@ def StartNewGame(x,y):
         elif i == 2:
             carrots[i].goto(-290,-290)
         carrots[i].showturtle()
-    CarrotMovementSpeed = 17
+    carrot_movement_speed = 17
     #Add the player back to the screen
-    Player.showturtle() 
-    Player.goto(100,-100)
+    player.showturtle() 
+    player.goto(100,-100)
     #Add the timer and clock back to the screen
-    TimerIcon.showturtle()  
-    timer = 0
+    timer_icon.showturtle()  
+    timer_value = 0
     for i in range(len(digits)):
         digits[i].shape("PixelNumbers/0.gif")
     digits[0].goto(260, 265)
     digits[1].goto(220, 265)
     digits[2].goto(180, 265)
     #Restart carrot movement and clock timer
-    screen.ontimer(Timer, 1000)
-    screen.ontimer(CarrotMovement, 25)
+    screen.ontimer(update_timer, 1000)
+    screen.ontimer(carrot_movement, 25)
+    #Enable main music loop
+    mixer.music.load(music_loop)
+    mixer.music.play(-1)
     #Disable gameOver variable
-    gameOver = False
+    game_over = False
+
+#Looks for key presses
+screen.listen() 
 
 ### Button press for a new game ###
-NewGame.onclick(StartNewGame)
+new_game.onclick(start_new_game)
         
 ### Timers ###
 #Carrot Movement Timer
-screen.ontimer(CarrotMovement, 25)
+screen.ontimer(carrot_movement, 25)
 
 #On Screen Timer
-screen.ontimer(Timer, 1000)
+screen.ontimer(update_timer, 1000)
 
 ### End of Main Loop ###
 trtl.Screen().mainloop()
@@ -343,7 +332,6 @@ trtl.Screen().mainloop()
 '''
 Possible Updates for Future Versions:
      -Add animations for characters
-     -Add Music
      -Add broccoli guy and pepper kid 
         ->Pepper gives short speed boost, but shows up only once every so often
         ->Brocoli gives a heart, but only appears when at 1 heart
