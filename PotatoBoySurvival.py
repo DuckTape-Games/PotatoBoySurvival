@@ -11,6 +11,8 @@ screen._root.resizable(False, False)
 screen.bgpic("bg.gif")
 Font = ("Monospace", 50)
 gameOver = False
+playerMovementSpeed = 15
+CarrotMovementSpeed = 17
 
 ### Carrot Setup ###
 # Before player setup so that the player will apear above the carrots on the screen #
@@ -98,7 +100,7 @@ def Up():
     Player.seth(90)
     xCor, yCor = Player.position()
     if CheckOutBounds(10, "Up", xCor, yCor):
-        Player.forward(10)
+        Player.forward(playerMovementSpeed)
         CheckCollision()
     
 #Moves The Player Right
@@ -106,7 +108,7 @@ def Right():
     xCor, yCor = Player.position()
     Player.seth(0)
     if CheckOutBounds(10, "Right", xCor, yCor):
-        Player.forward(10)
+        Player.forward(playerMovementSpeed)
         CheckCollision()
 
 #Moves The Player Left
@@ -114,7 +116,7 @@ def Left():
     xCor, yCor = Player.position()
     Player.seth(180)
     if CheckOutBounds(10, "Left", xCor, yCor):
-        Player.forward(10)
+        Player.forward(playerMovementSpeed)
         CheckCollision()
 
 #Moves The Player Down
@@ -122,7 +124,7 @@ def Down():
     Player.seth(270)
     xCor, yCor = Player.position()
     if CheckOutBounds(10, "Down", xCor, yCor):
-        Player.forward(10)
+        Player.forward(playerMovementSpeed)
         CheckCollision()
 
 ### Checks If Enemies And/Or The Player Is Out Of Bounds ###
@@ -157,6 +159,7 @@ screen.onkey(Down, "s")
 screen.listen() 
 
 ### Enemy Movements [Random] ###
+'''Next add: carrot moves toward potato after 30 seconds'''
 def CarrotMovement():
     for i in range(len(carrots)):
         direction = rnd.randint(0,3) * 90
@@ -172,7 +175,7 @@ def CarrotMovement():
         carX, carY = carrots[i].position()
         #Checks if the move will bring the carrot out of bounds
         if CheckOutBounds(17, direction, carX, carY):
-            carrots[i].forward(17)
+            carrots[i].forward(CarrotMovementSpeed)
         CheckCollision()
     #Checks if the game is over
     #If the game is over, the carrot timer will stop
