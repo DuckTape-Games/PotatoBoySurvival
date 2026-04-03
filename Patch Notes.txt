@@ -1,11 +1,13 @@
 Features:
--Configurable movement speeds
+-Smarter enemy behavior (new AI phase)
+-New follow/chase AI
+-Modular enemy movement functions
 
 Improvements:
--Player movement responsiveness
--Enemy movement consistency
--Code readability & maintainability
+-Difficulty curve
+-Enemy speed tuning
+-Cleaner movement structure
 
 Minor Fixes:
--Minor movement inconsistencies
--Edge-case timing reliability
+-Movement consistency
+-Logic clarity

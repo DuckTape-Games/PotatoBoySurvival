@@ -82,9 +82,6 @@ TimerText.goto(160,227)
 TimerText.color("White")
 TimerText.write(timer, font=Font)
 
-
-
-
 ### Create Game Over Screen
 screen.addshape("gameOver.gif")
 GameOverText = trtl.Turtle()
@@ -159,28 +156,52 @@ screen.onkey(Down, "s")
 screen.listen() 
 
 ### Enemy Movements [Random] ###
-'''Next add: carrot moves toward potato after 30 seconds'''
 def CarrotMovement():
+    global CarrotMovementSpeed
     for i in range(len(carrots)):
-        direction = rnd.randint(0,3) * 90
-        carrots[i].seth(direction)
-        if direction == 0:
-            direction = "Right"
-        elif direction == 90:
-            direction = "Up"
-        elif direction == 180:
-            direction = "Left"
+        if timer < 10:
+            RandomMovement(carrots[i])
         else:
-            direction = "Down"
-        carX, carY = carrots[i].position()
-        #Checks if the move will bring the carrot out of bounds
-        if CheckOutBounds(17, direction, carX, carY):
-            carrots[i].forward(CarrotMovementSpeed)
+           if timer == 10:
+               CarrotMovementSpeed = 7
+           FollowPlayer(carrots[i])
         CheckCollision()
     #Checks if the game is over
     #If the game is over, the carrot timer will stop
     if not gameOver:
         screen.ontimer(CarrotMovement, 25)
+
+### Random Movement
+def RandomMovement(carrot):
+    direction = rnd.randint(0,3) * 90
+    carrot.seth(direction)
+    if direction == 0:
+        direction = "Right"
+    elif direction == 90:
+        direction = "Up"
+    elif direction == 180:
+        direction = "Left"
+    else:
+        direction = "Down"
+    carX, carY = carrot.position()
+    #Checks if the move will bring the carrot out of bounds
+    if CheckOutBounds(17, direction, carX, carY):
+        carrot.forward(CarrotMovementSpeed)
+
+### Move Towards Player AI ###
+def FollowPlayer(carrot):
+    if Player.xcor() > carrot.xcor():
+        carrot.seth(0)
+        carrot.forward(CarrotMovementSpeed)
+    else:
+        carrot.seth(180)
+        carrot.forward(CarrotMovementSpeed)
+    if Player.ycor() > carrot.ycor():
+        carrot.seth(90)
+        carrot.forward(CarrotMovementSpeed)
+    else:
+        carrot.seth(270)
+        carrot.forward(CarrotMovementSpeed)
 
 ### Check For Collisions ###
 def CheckCollision():
