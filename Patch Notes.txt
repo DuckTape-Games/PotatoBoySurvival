@@ -1,13 +1,14 @@
 Features:
--Pixel-art timer digits (new HUD system)
--Dedicated survival time display on Game Over
--Repositionable digit system
+-New Game / Restart button
+-Full game reset system
+-Clickable UI interaction
 
-Improvements:
--HUD consistency
--Cleaner Game Over Screen
--Timer readability
+Imrprovements:
+-Player movement bounds consistency
+-Enemy speed change logic cleaned
+-Cleaner game over flow
 
-Fixes:
--Text flicker removed
--Timer overflow protection
+Restart Bug Fixes:
+-Timer restart reliability
+-Digit reset correctness
+-State cleanup bugs

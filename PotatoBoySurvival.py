@@ -100,7 +100,7 @@ GameOverText.speed(0)
 GameOverText.penup()
 GameOverText.hideturtle()
 GameOverText.shape("gameOver.gif")
-GameOverText.goto(-35,-20)
+GameOverText.goto(-35,30)
 
 ### Create Survival Time Text ###
 screen.addshape("survivalTime.gif")
@@ -109,14 +109,24 @@ SurvivalTimeText.speed(0)
 SurvivalTimeText.penup()
 SurvivalTimeText.hideturtle()
 SurvivalTimeText.shape("survivalTime.gif")
-SurvivalTimeText.goto(-5,-220)
+SurvivalTimeText.goto(-5,-190)
+
+### New Game Button ###
+screen.addshape("newGame.gif")
+screen.addshape("newGamePressed.gif") #changes to this when New Game is pressed
+NewGame = trtl.Turtle()
+NewGame.speed(0)
+NewGame.penup()
+NewGame.hideturtle()
+NewGame.shape("newGame.gif")
+NewGame.goto(0,-280)
 
 ### Player Movement Functions ###
 #Moves The Player Up
 def Up():
     Player.seth(90)
     xCor, yCor = Player.position()
-    if CheckOutBounds(10, "Up", xCor, yCor):
+    if CheckOutBounds(playerMovementSpeed, "Up", xCor, yCor):
         Player.forward(playerMovementSpeed)
         CheckCollision()
     
@@ -124,7 +134,7 @@ def Up():
 def Right():
     xCor, yCor = Player.position()
     Player.seth(0)
-    if CheckOutBounds(10, "Right", xCor, yCor):
+    if CheckOutBounds(playerMovementSpeed, "Right", xCor, yCor):
         Player.forward(playerMovementSpeed)
         CheckCollision()
 
@@ -132,7 +142,7 @@ def Right():
 def Left():
     xCor, yCor = Player.position()
     Player.seth(180)
-    if CheckOutBounds(10, "Left", xCor, yCor):
+    if CheckOutBounds(playerMovementSpeed, "Left", xCor, yCor):
         Player.forward(playerMovementSpeed)
         CheckCollision()
 
@@ -140,7 +150,7 @@ def Left():
 def Down():
     Player.seth(270)
     xCor, yCor = Player.position()
-    if CheckOutBounds(10, "Down", xCor, yCor):
+    if CheckOutBounds(playerMovementSpeed, "Down", xCor, yCor):
         Player.forward(playerMovementSpeed)
         CheckCollision()
 
@@ -154,6 +164,7 @@ def CheckOutBounds(speed, direction, xCor, yCor):
         return True
     elif direction == "Left" and xCor - speed > -320:
         return True
+    return False
 
 ### Key Presses For Player Movement ###
 #Up Movements
@@ -182,7 +193,7 @@ def CarrotMovement():
         if timer < 10:
             RandomMovement(carrots[i])
         else:
-           if timer == 10:
+           if CarrotMovementSpeed != 7 and timer >= 10:
                CarrotMovementSpeed = 7
            FollowPlayer(carrots[i])
         CheckCollision()
@@ -205,7 +216,7 @@ def RandomMovement(carrot):
         direction = "Down"
     carX, carY = carrot.position()
     #Checks if the move will bring the carrot out of bounds
-    if CheckOutBounds(17, direction, carX, carY):
+    if CheckOutBounds(CarrotMovementSpeed, direction, carX, carY):
         carrot.forward(CarrotMovementSpeed)
 
 ### Move Towards Player AI ###
@@ -253,9 +264,10 @@ def GameOver():
     TimerIcon.hideturtle()
     GameOverText.showturtle()
     SurvivalTimeText.showturtle()
-    digits[0].goto(-125,-228)
-    digits[1].goto(-165,-228)
-    digits[2].goto(-205,-228)
+    digits[0].goto(-125,-198)
+    digits[1].goto(-165,-198)
+    digits[2].goto(-205,-198)
+    NewGame.showturtle()
 
 ### On Screen Timer ###
 def Timer():
@@ -268,6 +280,53 @@ def Timer():
                 digits[i].shape(numbers[timerMath % 10])
                 timerMath = int(timerMath / 10)
         screen.ontimer(Timer, 1000) #restart timer loop
+
+### Resets the game to default state ###
+def StartNewGame(x,y):
+    #Global Variables for this method
+    global gameOver
+    global lives
+    global timer
+    #Change NewGame to the pressed color
+    NewGame.shape("newGamePressed.gif")
+    #Hide objects shown during end screen
+    NewGame.hideturtle()
+    NewGame.shape("newGame.gif")
+    GameOverText.hideturtle()
+    SurvivalTimeText.hideturtle()
+    #Place hearts back on the screen
+    for i in range(len(hearts)):
+        hearts[i].showturtle()
+        hearts[i].shape("heart.gif")
+        lives = 3
+    #Place the carrots back on the screen
+    for i in range(len(carrots)):
+        if i == 0:
+            carrots[i].goto(290,290)
+        elif i == 1:
+            carrots[i].goto(-290,210)
+        elif i == 2:
+            carrots[i].goto(-290,-290)
+        carrots[i].showturtle()
+    #Add the player back to the screen
+    Player.showturtle() 
+    Player.goto(100,-100)
+    #Add the timer and clock back to the screen
+    TimerIcon.showturtle()  
+    timer = 0
+    for i in range(len(digits)):
+        digits[i].shape("PixelNumbers/0.gif")
+    digits[0].goto(260, 265)
+    digits[1].goto(220, 265)
+    digits[2].goto(180, 265)
+    #Restart carrot movement and clock timer
+    screen.ontimer(Timer, 1000)
+    screen.ontimer(CarrotMovement, 25)
+    #Disable gameOver variable
+    gameOver = False
+
+### Button press for a new game ###
+NewGame.onclick(StartNewGame)
         
 ### Timers ###
 #Carrot Movement Timer
