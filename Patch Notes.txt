@@ -1,0 +1,11 @@
+Features:
+-Player and Enemy animation
+-Per-enemy animation state system
+
+Improvements:
+-Smoother enemy movement timing
+-Better visual feedback during play
+-Animation integrated into movement logic
+
+Bug Fixes:
+-Minor timing stability
