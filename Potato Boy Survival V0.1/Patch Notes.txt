@@ -1,0 +1,22 @@
+Added:
+-Full Python rewrite using turtle graphics
+    -Sprite-based visuals instead of basic shapes
+    -Random enemy movement (carrots)
+    -Multiple simultaneous enemies
+    -Smooth continuous enemy motion loop
+    -On-screen survival timer
+    -Heart UI with damage states
+    -Player knockback on hit
+    -Game Over screen with survival time display
+    -Screen boundaries
+    -Background art
+    -Keyboard WASD + arrow controls
+
+Improved vs Java prototype:
+-Better visuals (sprites instead of simple shapes)
+-More enemies at once
+-More dynamic movement
+-Real-time timer pressure
+-Cleaner HUD
+-Faster gameplay feel
+-Simpler deployment (Python script instead of Java project)
