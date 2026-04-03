@@ -1,13 +1,13 @@
 Features:
--Smarter enemy behavior (new AI phase)
--New follow/chase AI
--Modular enemy movement functions
+-Pixel-art timer digits (new HUD system)
+-Dedicated survival time display on Game Over
+-Repositionable digit system
 
 Improvements:
--Difficulty curve
--Enemy speed tuning
--Cleaner movement structure
+-HUD consistency
+-Cleaner Game Over Screen
+-Timer readability
 
-Minor Fixes:
--Movement consistency
--Logic clarity
+Fixes:
+-Text flicker removed
+-Timer overflow protection

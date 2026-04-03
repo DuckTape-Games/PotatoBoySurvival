@@ -69,18 +69,29 @@ TimerIcon.shape("timer.gif")
 TimerIcon.penup()
 TimerIcon.goto(135,265)
 TimerIcon.showturtle()
-
 #Timer Variable
 timer = 0
 
-#Timer Text
-TimerText = trtl.Turtle()
-TimerText.speed(0)
-TimerText.hideturtle()
-TimerText.penup()
-TimerText.goto(160,227)
-TimerText.color("White")
-TimerText.write(timer, font=Font)
+## Pixel Numbers ##
+numbers = []
+for i in range(10):
+    numbers.append("PixelNumbers/" + str(i) + ".gif")
+    screen.addshape(numbers[i])
+#Create turtles for ones, tens, and hundreds place
+digits = []
+for i in range(3):
+    digits.append(trtl.Turtle())
+    digits[i].hideturtle()
+    digits[i].speed(0)
+    digits[i].shape(numbers[0])
+    digits[i].penup()
+    if i == 0:
+        digits[i].goto(260, 265)
+    elif i == 1:
+        digits[i].goto(220, 265)
+    else:
+        digits[i].goto(180, 265)
+    digits[i].showturtle()
 
 ### Create Game Over Screen
 screen.addshape("gameOver.gif")
@@ -89,7 +100,16 @@ GameOverText.speed(0)
 GameOverText.penup()
 GameOverText.hideturtle()
 GameOverText.shape("gameOver.gif")
-GameOverText.goto(-30,-20)
+GameOverText.goto(-35,-20)
+
+### Create Survival Time Text ###
+screen.addshape("survivalTime.gif")
+SurvivalTimeText = trtl.Turtle()
+SurvivalTimeText.speed(0)
+SurvivalTimeText.penup()
+SurvivalTimeText.hideturtle()
+SurvivalTimeText.shape("survivalTime.gif")
+SurvivalTimeText.goto(-5,-220)
 
 ### Player Movement Functions ###
 #Moves The Player Up
@@ -169,7 +189,7 @@ def CarrotMovement():
     #Checks if the game is over
     #If the game is over, the carrot timer will stop
     if not gameOver:
-        screen.ontimer(CarrotMovement, 25)
+        screen.ontimer(CarrotMovement, 25) #restart carrot movement loop
 
 ### Random Movement
 def RandomMovement(carrot):
@@ -232,24 +252,26 @@ def GameOver():
     Player.hideturtle()
     TimerIcon.hideturtle()
     GameOverText.showturtle()
-    TimerText.goto(0,-300)
-    TimerText.color("Black")
-    TimerText.clear()
-    TimerText.write("You Survived For\n" + str(timer) + " Seconds", font=Font, align="Center")
+    SurvivalTimeText.showturtle()
+    digits[0].goto(-125,-228)
+    digits[1].goto(-165,-228)
+    digits[2].goto(-205,-228)
 
 ### On Screen Timer ###
 def Timer():
     global timer
     if not gameOver: #Checks to make sure the game is still going
         timer += 1
-        TimerText.clear()
-        TimerText.write(timer, font=Font)
-        screen.ontimer(Timer, 1000)
+        timerMath = timer
+        if timer <= 999:
+            for i in range(len(digits)):
+                digits[i].shape(numbers[timerMath % 10])
+                timerMath = int(timerMath / 10)
+        screen.ontimer(Timer, 1000) #restart timer loop
         
 ### Timers ###
 #Carrot Movement Timer
 screen.ontimer(CarrotMovement, 25)
-
 
 #On Screen Timer
 screen.ontimer(Timer, 1000)
