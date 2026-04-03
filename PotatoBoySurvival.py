@@ -1,3 +1,8 @@
+'''
+Potato Boy Survival
+Created By: Chris Herriman Jr
+Goal: Survive as long as possible without losing all 3 lives
+'''
 ### IMPORTS ###
 import turtle as trtl #Turtle interface, used for game functionality and visuals, shortened to trtl
 import random as rnd #Random, used to randomly generate enemy movements, shortened to rnd
@@ -11,6 +16,7 @@ screen._root.resizable(False, False)
 screen.bgpic("bg.gif")
 Font = ("Monospace", 50)
 gameOver = False
+#Default movement speeds 
 playerMovementSpeed = 15
 CarrotMovementSpeed = 17
 
@@ -122,47 +128,43 @@ NewGame.shape("newGame.gif")
 NewGame.goto(0,-280)
 
 ### Player Movement Functions ###
-#Moves The Player Up
-def Up():
-    Player.seth(90)
-    xCor, yCor = Player.position()
-    if CheckOutBounds(playerMovementSpeed, "Up", xCor, yCor):
-        Player.forward(playerMovementSpeed)
-        CheckCollision()
-    
 #Moves The Player Right
 def Right():
     xCor, yCor = Player.position()
     Player.seth(0)
-    if CheckOutBounds(playerMovementSpeed, "Right", xCor, yCor):
+    if CheckOutBounds(playerMovementSpeed, 0, xCor, yCor):
         Player.forward(playerMovementSpeed)
-        CheckCollision()
+
+#Moves The Player Up
+def Up():
+    Player.seth(90)
+    xCor, yCor = Player.position()
+    if CheckOutBounds(playerMovementSpeed, 90, xCor, yCor):
+        Player.forward(playerMovementSpeed)
 
 #Moves The Player Left
 def Left():
     xCor, yCor = Player.position()
     Player.seth(180)
-    if CheckOutBounds(playerMovementSpeed, "Left", xCor, yCor):
+    if CheckOutBounds(playerMovementSpeed, 180, xCor, yCor):
         Player.forward(playerMovementSpeed)
-        CheckCollision()
 
 #Moves The Player Down
 def Down():
     Player.seth(270)
     xCor, yCor = Player.position()
-    if CheckOutBounds(playerMovementSpeed, "Down", xCor, yCor):
+    if CheckOutBounds(playerMovementSpeed, 270, xCor, yCor):
         Player.forward(playerMovementSpeed)
-        CheckCollision()
 
 ### Checks If Enemies And/Or The Player Is Out Of Bounds ###
 def CheckOutBounds(speed, direction, xCor, yCor):
-    if direction == "Up" and yCor + speed < 330:
+    if direction == 90 and yCor + speed < 330: #Check up
         return True 
-    elif direction == "Down" and yCor - speed > -290:
+    elif direction == 270 and yCor - speed > -290: #Check down
         return True
-    elif direction == "Right" and xCor + speed < 300:
+    elif direction == 0 and xCor + speed < 300: #Check right
         return True
-    elif direction == "Left" and xCor - speed > -320:
+    elif direction == 180 and xCor - speed > -320: #Check left
         return True
     return False
 
@@ -194,7 +196,7 @@ def CarrotMovement():
             RandomMovement(carrots[i])
         else:
            if CarrotMovementSpeed != 7 and timer >= 10:
-               CarrotMovementSpeed = 7
+               CarrotMovementSpeed = 5
            FollowPlayer(carrots[i])
         CheckCollision()
     #Checks if the game is over
@@ -206,20 +208,13 @@ def CarrotMovement():
 def RandomMovement(carrot):
     direction = rnd.randint(0,3) * 90
     carrot.seth(direction)
-    if direction == 0:
-        direction = "Right"
-    elif direction == 90:
-        direction = "Up"
-    elif direction == 180:
-        direction = "Left"
-    else:
-        direction = "Down"
     carX, carY = carrot.position()
     #Checks if the move will bring the carrot out of bounds
     if CheckOutBounds(CarrotMovementSpeed, direction, carX, carY):
         carrot.forward(CarrotMovementSpeed)
 
 ### Move Towards Player AI ###
+# Effective speed is 1.41x speed
 def FollowPlayer(carrot):
     if Player.xcor() > carrot.xcor():
         carrot.seth(0)
@@ -240,6 +235,11 @@ def CheckCollision():
     for i in range(len(carrots)):
         carrotX, carrotY = carrots[i].position()
         if (playerX - carrotX < 45 and playerX - carrotX > -45) and (playerY - carrotY < 70 and playerY - carrotY > -70):
+            jumpInBounds = False
+            while not jumpInBounds:
+                direction = rnd.randint(0,3)*90
+                jumpInBounds = CheckOutBounds(300, direction, carrotX, carrotY)
+            carrots[i].seth(direction)
             carrots[i].forward(300)
             Damaged()
 
@@ -287,6 +287,7 @@ def StartNewGame(x,y):
     global gameOver
     global lives
     global timer
+    global CarrotMovementSpeed
     #Change NewGame to the pressed color
     NewGame.shape("newGamePressed.gif")
     #Hide objects shown during end screen
@@ -298,7 +299,7 @@ def StartNewGame(x,y):
     for i in range(len(hearts)):
         hearts[i].showturtle()
         hearts[i].shape("heart.gif")
-        lives = 3
+    lives = 3
     #Place the carrots back on the screen
     for i in range(len(carrots)):
         if i == 0:
@@ -308,6 +309,7 @@ def StartNewGame(x,y):
         elif i == 2:
             carrots[i].goto(-290,-290)
         carrots[i].showturtle()
+    CarrotMovementSpeed = 17
     #Add the player back to the screen
     Player.showturtle() 
     Player.goto(100,-100)
@@ -337,3 +339,12 @@ screen.ontimer(Timer, 1000)
 
 ### End of Main Loop ###
 trtl.Screen().mainloop()
+
+'''
+Possible Updates for Future Versions:
+     -Add animations for characters
+     -Add Music
+     -Add broccoli guy and pepper kid 
+        ->Pepper gives short speed boost, but shows up only once every so often
+        ->Brocoli gives a heart, but only appears when at 1 heart
+'''

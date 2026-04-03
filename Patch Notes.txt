@@ -1,14 +1,10 @@
-Features:
--New Game / Restart button
--Full game reset system
--Clickable UI interaction
+Bug Fixes:
+-Carrot knockback could push enemies out of bounds
+-Restart didn’t fully restore enemy speed
 
-Imrprovements:
--Player movement bounds consistency
--Enemy speed change logic cleaned
--Cleaner game over flow
-
-Restart Bug Fixes:
--Timer restart reliability
--Digit reset correctness
--State cleanup bugs
+Improvements:
+-Movement bounds logic standardized
+-Cleaner player movement code
+-Enemy chase tuning
+-Random movement simplified
+-Polish and stability
