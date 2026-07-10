@@ -7,6 +7,19 @@ Goal: Survive as long as possible without losing all 3 lives
 import turtle as trtl #Turtle interface, used for game functionality and visuals, shortened to trtl
 import random as rnd #Random, used to randomly generate enemy movements, shortened to rnd
 from pygame import mixer #Mixer from the pygame library, used for music loops and sound effects
+import os, sys #For pyinstaller
+
+
+### Makes onefile mode work in pyinstaller
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 ### Game Base and Screen Setup ###
 trtl.clearscreen()
@@ -15,9 +28,9 @@ trtl.title("Potato Boy Survival")
 screen.setup(700,700)
 #Calls to tkinter
 screen._root.resizable(False, False) #Sets the screen to not be resizable
-screen._root.iconbitmap("potatoBoy.ico") #Sets up the app icon
+screen._root.iconbitmap(resource_path("potatoBoy.ico")) #Sets up the app icon
 #Set background
-screen.bgpic("bg.gif")
+screen.bgpic(resource_path("bg.gif"))
 #Create game_over and set it to false
 game_over = False
 #Default movement speeds 
@@ -25,12 +38,12 @@ player_movement_speed = 15
 carrot_movement_speed = 17
 #Music Setup
 mixer.init()
-music_loop = "musicLoop.wav" #Created by user EEE3333E on freesound.org
-game_over_music_loop = "gameOverMusicLoop.wav" #Modified version of the game loop music
+music_loop = resource_path("musicLoop.wav") #Created by user EEE3333E on freesound.org
+game_over_music_loop = resource_path("gameOverMusicLoop.wav") #Modified version of the game loop music
 mixer.music.load(music_loop)
 mixer.music.play(-1)
 #Hit Sound Setup
-hit_sound = mixer.Sound('hitSound.wav') #Created by user Sadiquecat on freesound.org
+hit_sound = mixer.Sound(resource_path('hitSound.wav')) #Created by user Sadiquecat on freesound.org
 
 ### Function to condense object setup lines ###  
 def setup_objects(game_object, object_model, object_x, object_y, start_shown, already_registered):
@@ -46,7 +59,7 @@ def setup_objects(game_object, object_model, object_x, object_y, start_shown, al
 
 ### Carrot Setup ###
 carrots = [] #List to contain enemies
-carrot_frames = ["carrotFrame1.gif", "carrotFrame2.gif"]
+carrot_frames = [resource_path("carrotFrame1.gif"), resource_path("carrotFrame2.gif")]
 carrot_frame_state = [True,True,True]
 for i in range(3):
     carrots.append(trtl.Turtle()) 
@@ -57,7 +70,7 @@ screen.addshape(carrot_frames[1])
 
 ### Player Setup ###
 player_frame_state = True
-player_frames = ["potatoFrame1.gif", "potatoFrame2.gif"]
+player_frames = [resource_path("potatoFrame1.gif"), resource_path("potatoFrame2.gif")]
 player = trtl.Turtle()
 setup_objects(player,player_frames[0],100,-100,True,False)
 screen.addshape(player_frames[1])
@@ -67,22 +80,22 @@ lives = 3
 hearts = []
 for i in range(3):
     hearts.append(trtl.Turtle())
-setup_objects(hearts[0],"heart.gif",-275,275,True,False)
-setup_objects(hearts[1],"heart.gif",-205,275,True,True)
-setup_objects(hearts[2],"heart.gif",-135,275,True,True)
-screen.addshape("damaged.gif") #Sprite for when the player gets hurt
+setup_objects(hearts[0],resource_path("heart.gif"),-275,275,True,False)
+setup_objects(hearts[1],resource_path("heart.gif"),-205,275,True,True)
+setup_objects(hearts[2],resource_path("heart.gif"),-135,275,True,True)
+screen.addshape(resource_path("damaged.gif")) #Sprite for when the player gets hurt
 
 ### Create Timer and Timer Icon ###
 #Timer Icon
 timer_icon = trtl.Turtle()
-setup_objects(timer_icon,"timer.gif",135,265,True,False)
+setup_objects(timer_icon,resource_path("timer.gif"),135,265,True,False)
 #Timer Variable
 timer_value = 0
 
 ## Pixel Numbers ##
 numbers = []
 for i in range(10):
-    numbers.append("PixelNumbers/" + str(i) + ".gif")
+    numbers.append(resource_path("PixelNumbers/" + str(i) + ".gif"))
     screen.addshape(numbers[i])
 #Create turtles for ones, tens, and hundreds place
 digits = []
@@ -94,16 +107,16 @@ setup_objects(digits[2],numbers[0],180,265,True,True)
 
 ### Create Game Over Screen
 game_over_text = trtl.Turtle()
-setup_objects(game_over_text,"gameOver.gif",-35,30,False,False)
+setup_objects(game_over_text,resource_path("gameOver.gif"),-35,30,False,False)
 
 ### Create Survival Time Text ###
 survival_time_text = trtl.Turtle()
-setup_objects(survival_time_text,"survivalTime.gif",-5,-190,False,False)
+setup_objects(survival_time_text,resource_path("survivalTime.gif"),-5,-190,False,False)
 
 ### New Game Button ###
 new_game = trtl.Turtle()
-setup_objects(new_game,"newGame.gif",0,-280,False,False)
-screen.addshape("newGamePressed.gif") #changes to this when New Game is pressed
+setup_objects(new_game,resource_path("newGame.gif"),0,-280,False,False)
+screen.addshape(resource_path("newGamePressed.gif")) #changes to this when New Game is pressed
     
 #Make sure everything is appearing on screen
 screen.update()
@@ -231,7 +244,7 @@ def damaged():
     if lives > 0:
         lives = lives - 1
         hit_sound.play()
-        hearts[lives].shape("damaged.gif")
+        hearts[lives].shape(resource_path("damaged.gif"))
         if lives == 0:
             stop_game()
 
@@ -282,16 +295,16 @@ def start_new_game(x,y):
     global timer_value
     global carrot_movement_speed
     #Change NewGame to the pressed color
-    new_game.shape("newGamePressed.gif")
+    new_game.shape(resource_path("newGamePressed.gif"))
     #Hide objects shown during end screen
     new_game.hideturtle()
-    new_game.shape("newGame.gif")
+    new_game.shape(resource_path("newGame.gif"))
     game_over_text.hideturtle()
     survival_time_text.hideturtle()
     #Place hearts back on the screen
     for i in range(len(hearts)):
         hearts[i].showturtle()
-        hearts[i].shape("heart.gif")
+        hearts[i].shape(resource_path("heart.gif"))
     lives = 3
     #Place the carrots back on the screen
     for i in range(len(carrots)):
@@ -310,7 +323,7 @@ def start_new_game(x,y):
     timer_icon.showturtle()  
     timer_value = 0
     for i in range(len(digits)):
-        digits[i].shape("PixelNumbers/0.gif")
+        digits[i].shape(resource_path("PixelNumbers/0.gif"))
     digits[0].goto(260, 265)
     digits[1].goto(220, 265)
     digits[2].goto(180, 265)
